@@ -9,7 +9,7 @@ def register_user(name, save_dir="face_recognition_app/encodings"):
     #Create encoding directory if not exists
     os.makedirs(save_dir, exist_ok=True)
 
-    #Start webcam
+    # Start webcam
     cap = cv2.VideoCapture(0)
     print("[INFO] Starting camera... Press 's' to capture your face.")
 

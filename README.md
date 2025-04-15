@@ -7,6 +7,10 @@ This is a smart attendance system using QR codes and face recognition.
 - Generate QR codes for users based on their names
 - Each QR code embeds user name and date
 - Saved as PNG in `qr_codes/` folder
+- Take and save user face in .pkl file 'encodings/'folder
+- Reads QR code from webcam
+- Matches live face with registered encoding
+- Logs attendance with name + timestamp in Excel file
 
 ##  Module: QR Generator
 
@@ -25,3 +29,12 @@ Run:
 
 ```bash
 python face_recognition_app/register_face.py
+
+##  Face + QR Verification & Attendance Logging
+verify user qr with corresponding face 
+
+Run:
+
+```bash
+python face_recognition_app/verify_and_log.py
+
