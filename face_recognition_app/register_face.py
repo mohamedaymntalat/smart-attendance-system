@@ -1,64 +1,33 @@
-import cv2
 import face_recognition
 import pickle
 import os
+import numpy as np
+from PIL import Image
 
-# Function to register a new user's face
-def register_user(name, save_dir="face_recognition_app/encodings"):
 
-    #Create encoding directory if not exists
+def register_face(image_file, user_name, save_dir="face_recognition_app/encodings"):
+
     os.makedirs(save_dir, exist_ok=True)
 
-    # Start webcam
-    cap = cv2.VideoCapture(0)
-    print("[INFO] Starting camera... Press 's' to capture your face.")
+    # Load image and convert to RGB numpy array
+    img = Image.open(image_file)
+    rgb = np.array(img.convert("RGB"))
 
-    face_encoding = None
+    # Detect faces
+    faces = face_recognition.face_locations(rgb)
+    face_count = len(faces)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("[ERROR] Failed to grab frame.")
-            break
+    # Must detect exactly one face
+    if face_count != 1:
+        return False, None, face_count
 
-        #Display the frame
-        cv2.imshow("Face Registration - Press 's' to capture", frame)
+    # Compute encoding
+    encoding = face_recognition.face_encodings(rgb, faces)[0]
 
-        #Wait for key press
-        key = cv2.waitKey(1) & 0xFF
+    # Save encoding to disk
+    filename = f"{user_name.lower().replace(' ', '_')}.pkl"
+    file_path = os.path.join(save_dir, filename)
+    with open(file_path, "wb") as f:
+        pickle.dump(encoding, f)
 
-        #If 's' is pressed → capture frame
-        if key == ord("s"):
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-            #Detect face & encode
-            face_locations = face_recognition.face_locations(rgb_frame)
-            if len(face_locations) != 1:
-                print("[WARNING] Please ensure one face is visible.")
-                continue
-
-            face_encoding = face_recognition.face_encodings(rgb_frame, face_locations)[0]
-            break
-
-        elif key == ord("q"):
-            print("[INFO] Exiting without saving.")
-            break
-
-    # Release resources
-    cap.release()
-    cv2.destroyAllWindows()
-
-    if face_encoding is not None:
-        # Save encoding to file
-        file_path = os.path.join(save_dir, f"{name.replace(' ', '_').lower()}.pkl")
-        with open(file_path, "wb") as f:
-            pickle.dump(face_encoding, f)
-
-        print(f"[✔] Face encoding saved for user: {name} → {file_path}")
-    else:
-        print("[X] No encoding was saved.")
-
-#  Example usage
-if __name__ == "__main__":
-    username = input("Enter your name to register face: ")
-    register_user(username)
+    return True, file_path, face_count

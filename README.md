@@ -38,3 +38,9 @@ Run:
 ```bash
 python face_recognition_app/verify_and_log.py
 
+##  Streamlit -  Registration UI
+
+Run the Streamlit app to register users and generate their QR codes.
+
+```bash
+streamlit run streamlit_app/registration_ui.py
